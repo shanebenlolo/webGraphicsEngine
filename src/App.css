@@ -1,0 +1,54 @@
+.App {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  background: rgb(29, 29, 29);
+  color: white;
+}
+
+.button {
+  width: 10em;
+  appearance: none;
+  background: none;
+  font-size: 1.5em;
+  padding-left: 1em;
+  padding-right: 1em;
+  margin: 1em;
+  outline: none;
+  border: 0.1em solid rgb(255, 255, 255);
+  padding-bottom: 0.2em;
+  cursor: pointer;
+  border-radius: 0.2em;
+  transition: all 0.15s;
+  color: white;
+}
+
+.button:active {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.asyncButton {
+  position: relative;
+}
+
+.asyncButton:active:after {
+  width: 0%;
+  opacity: 1;
+  transition: 0s;
+}
+
+.buttonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.user-info {
+  color: rgb(255, 255, 255);
+  margin: 2em;
+  padding: 2em;
+  border-radius: 0.1em;
+  background: rgb(255, 255, 255);
+}

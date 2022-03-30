@@ -1,0 +1,13 @@
+.graphicsEngine {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.controls {
+  width: 20em;
+}
+
+.canvasContainer {
+  margin: 3em;
+}

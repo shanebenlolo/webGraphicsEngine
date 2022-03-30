@@ -1,0 +1,5 @@
+users.js is a dummy api that contains boilerplate and a styleguide for api calls.
+
+/shapes will eventually move to a nodejs backend and be used to bring shapes into scenes as
+requested by users. In the meantime it will live on the front end and be called to directly
+until the amount of geometry being called is too large to keep on the front end.
