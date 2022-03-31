@@ -1,4 +1,4 @@
-import { drawScene } from "./drawScene";
+import { drawScene } from "./drawScene.ts";
 
 let then = 0;
 

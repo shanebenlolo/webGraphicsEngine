@@ -1,8 +1,15 @@
 import { mat4 } from "gl-matrix";
+import { VertexArray } from "./VertexArray";
 let cubeRotation = 0.0;
 
 // Draw the scene.
-const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
+const drawScene = (
+  gl: any,
+  programInfo: any,
+  buffers: any,
+  texture: any,
+  deltaTime: any
+) => {
   gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
   gl.clearDepth(1.0); // Clear everything
   gl.enable(gl.DEPTH_TEST); // Enable depth testing
@@ -41,22 +48,20 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
     modelViewMatrix, // matrix to translate
     [-0.0, 0.0, -6.0]
   ); // amount to translate
+
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
     cubeRotation, // amount to rotate in radians
     [0, 0, 1]
   ); // axis to rotate around (Z)
+
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
     cubeRotation * 0.7, // amount to rotate in radians
     [0, 1, 0]
   ); // axis to rotate around (X)
-
-  const normalMatrix = mat4.create();
-  mat4.invert(normalMatrix, modelViewMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
 
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute
@@ -66,8 +71,8 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
     const normalize = false; // don't normalize
     const stride = 0; // how many bytes to get from one set of values to the next
     const offset = 0; // how many bytes inside the buffer to start from
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
+    const positionVertexArray = new VertexArray(
+      buffers.position,
       programInfo.attribLocations.vertexPosition,
       numComponents,
       type,
@@ -75,7 +80,7 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
       stride,
       offset
     );
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+    positionVertexArray.enable(gl);
   }
 
   // Tell WebGL how to pull out the texture coordinates from
@@ -86,8 +91,8 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
     const normalize = false;
     const stride = 0;
     const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
-    gl.vertexAttribPointer(
+    const textureVertexArray = new VertexArray(
+      buffers.textureCoord,
       programInfo.attribLocations.textureCoord,
       numComponents,
       type,
@@ -95,7 +100,7 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
       stride,
       offset
     );
-    gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+    textureVertexArray.enable(gl);
   }
 
   // Tell WebGL how to pull out the normals from
@@ -106,8 +111,8 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
     const normalize = false;
     const stride = 0;
     const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
-    gl.vertexAttribPointer(
+    const normalVertexArray = new VertexArray(
+      buffers.normal,
       programInfo.attribLocations.vertexNormal,
       numComponents,
       type,
@@ -115,7 +120,7 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
       stride,
       offset
     );
-    gl.enableVertexAttribArray(programInfo.attribLocations.vertexNormal);
+    normalVertexArray.enable(gl);
   }
 
   // Tell WebGL which indices to use to index the vertices
@@ -144,11 +149,10 @@ const drawScene = (gl, programInfo, buffers, texture, deltaTime) => {
   );
 
   // uNormalMatrix, this is for lighting
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.normalMatrix,
-    false,
-    normalMatrix
-  );
+  const normalMatrix = mat4.create();
+  mat4.invert(normalMatrix, modelViewMatrix);
+  mat4.transpose(normalMatrix, normalMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
 
   // Specify the texture to map onto the faces.
 

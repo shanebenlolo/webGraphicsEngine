@@ -1,9 +1,9 @@
 import { cube } from "../apis/shapes/cube/cubeBuffers";
-import { IndexBuffer } from "./buffers/IndexBuffer.ts";
-import { VertexBuffer } from "./buffers/VertexBuffer.ts";
+import { IndexBuffer } from "./buffers/IndexBuffer";
+import { VertexBuffer } from "./buffers/VertexBuffer";
 
-function initBuffers(gl) {
-  var colors = [];
+function initBuffers(gl: WebGL2RenderingContext) {
+  var colors: Array<number> = [];
   for (var j = 0; j < cube.colorBuffer.length; j++) {
     const c = cube.colorBuffer[j];
     // assign rgba value at every corner (vertex) of each cube face

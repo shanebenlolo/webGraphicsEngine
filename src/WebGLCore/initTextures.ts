@@ -2,7 +2,7 @@
 // Initialize a texture and load an image.
 // When the image finished loading copy it into the texture.
 //
-const initTextures = (gl, url) => {
+const initTextures = (gl: WebGL2RenderingContext, url: string) => {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -34,14 +34,7 @@ const initTextures = (gl, url) => {
   const image = new Image();
   image.onload = function () {
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      level,
-      internalFormat,
-      srcFormat,
-      srcType,
-      image
-    );
+    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, srcFormat, srcType, image);
 
     // WebGL1 has different requirements for power of 2 images
     // vs non power of 2 images so check if the image is a
@@ -62,7 +55,7 @@ const initTextures = (gl, url) => {
   return texture;
 };
 
-function isPowerOf2(value) {
+function isPowerOf2(value: number) {
   return (value & (value - 1)) === 0;
 }
 

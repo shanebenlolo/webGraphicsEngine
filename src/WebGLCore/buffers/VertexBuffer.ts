@@ -1,6 +1,6 @@
 class VertexBuffer {
   data: Float32Array;
-  buffer: WebGLBuffer;
+  buffer: WebGLBuffer | null;
 
   constructor(gl: WebGL2RenderingContext, data: Float32Array) {
     this.buffer = gl.createBuffer();
