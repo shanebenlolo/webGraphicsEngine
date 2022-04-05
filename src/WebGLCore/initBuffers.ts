@@ -18,8 +18,7 @@ function initBuffers(gl: WebGL2RenderingContext) {
   const indexBuffer = new IndexBuffer(gl, new Uint16Array(cube.indexBuffer));
 
   return {
-    color: colorBuffer.buffer, //this is current not being shown due to contents of glsl shaders
-
+    color: colorBuffer.buffer,
     position: positionBuffer.buffer,
     textureCoord: textureBuffer.buffer,
     normal: normalBuffer.buffer,

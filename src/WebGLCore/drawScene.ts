@@ -16,7 +16,6 @@ const drawScene = (
   gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
   // Clear the canvas before we start drawing on it.
-
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // Create a perspective matrix, a special matrix that is
@@ -63,6 +62,7 @@ const drawScene = (
     [0, 1, 0]
   ); // axis to rotate around (X)
 
+  // POSITION
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute
   {
@@ -83,6 +83,26 @@ const drawScene = (
     positionVertexArray.enable(gl);
   }
 
+  // COLOR
+  {
+    const numComponents = 4; // pull out 2 values per iteration
+    const type = gl.FLOAT; // the data in the buffer is 32bit floats
+    const normalize = false; // don't normalize
+    const stride = 0; // how many bytes to get from one set of values to the next
+    const offset = 0; // how many bytes inside the buffer to start from
+    const colorVertexArray = new VertexArray(
+      buffers.color,
+      programInfo.attribLocations.vertexColor,
+      numComponents,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+    colorVertexArray.enable(gl);
+  }
+
+  // TEXTURE
   // Tell WebGL how to pull out the texture coordinates from
   // the texture coordinate buffer into the textureCoord attribute.
   {
@@ -103,6 +123,7 @@ const drawScene = (
     textureVertexArray.enable(gl);
   }
 
+  // LIGHTING
   // Tell WebGL how to pull out the normals from
   // the normal buffer into the vertexNormal attribute.
   {
@@ -158,12 +179,13 @@ const drawScene = (
 
   // Tell WebGL we want to affect texture unit 0
   gl.activeTexture(gl.TEXTURE0);
-
   // Bind the texture to texture unit 0
   gl.bindTexture(gl.TEXTURE_2D, texture);
-
   // Tell the shader we bound the texture to texture unit 0
   gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+
+  // pass deltaTime as uniform to GLSL
+  gl.uniform1f(programInfo.uniformLocations.uTime, deltaTime);
 
   {
     const vertexCount = 36;
@@ -173,7 +195,6 @@ const drawScene = (
   }
 
   // Update the rotation for the next draw
-
   cubeRotation += deltaTime;
 };
 

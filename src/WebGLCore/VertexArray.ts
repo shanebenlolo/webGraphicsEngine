@@ -26,6 +26,7 @@ class VertexArray {
   }
 
   enable(gl: WebGL2RenderingContext) {
+    console.log();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.vertexAttribPointer(
       this.attribute,
