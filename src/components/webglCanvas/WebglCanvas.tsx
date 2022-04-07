@@ -4,8 +4,15 @@ import { initWebGL } from "../../WebGLCore/main";
 import { render } from "../../WebGLCore/renderer";
 import Slider from "@mui/material/Slider";
 import "./webgl.css";
+import { GLProps } from "../../WebGLCore/interfaces/GLProps";
+import { ProgramInfo } from "../../WebGLCore/interfaces/ProgramInfo";
+import { Buffers } from "../../WebGLCore/interfaces/Buffers";
 
-let gl, programInfo, buffers, texture;
+let renderProps: GLProps;
+let gl: WebGLRenderingContext;
+let programInfo: ProgramInfo;
+let buffers: Buffers;
+let texture: WebGLTexture;
 
 export function WebglCanvas() {
   const canvasRef = useRef(null);
@@ -15,21 +22,23 @@ export function WebglCanvas() {
   const [currentAnimationId, setCurrentAnimationId] = useState(null);
 
   useEffect(() => {
-    [gl, programInfo, buffers, texture] = initWebGL(canvasRef);
+    renderProps = initWebGL(canvasRef);
   }, []);
 
   useEffect(() => {
     cancelAnimationFrame(currentAnimationId);
     requestAnimationFrame((timestamp) => {
-      const animationId = render(timestamp, gl, programInfo, buffers, texture, spinRate);
+      const animationId = render(renderProps, timestamp, spinRate);
       setCurrentAnimationId(animationId);
     });
   }, [spinRate]);
 
-  const handleChange = (event, newValue) => {
-    setSlider(newValue);
-    setSpinRate(newValue / 10000);
-  };
+  function handleChange(newValue: number | number[]) {
+    if (typeof newValue === "number") {
+      setSlider(newValue);
+      setSpinRate(newValue / 10000);
+    }
+  }
 
   return (
     <div className="graphicsEngine">
@@ -39,7 +48,7 @@ export function WebglCanvas() {
           className="slider"
           aria-label="Speed"
           value={slider}
-          onChange={handleChange}
+          onChange={(event, test) => handleChange(test)}
           color="secondary"
         />
       </div>

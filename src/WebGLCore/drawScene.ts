@@ -1,79 +1,71 @@
 import { mat4 } from "gl-matrix";
-import { VertexArray } from "./VertexArray";
+import { VertexArray } from "./classes/VertexArray";
+import { Buffers } from "./interfaces/Buffers";
+import { ProgramInfo } from "./interfaces/ProgramInfo";
+
 let cubeRotation = 0.0;
 
-// Draw the scene.
 const drawScene = (
-  gl: any,
-  programInfo: any,
-  buffers: any,
-  texture: any,
-  deltaTime: any
+  gl: WebGLRenderingContext,
+  programInfo: ProgramInfo,
+  buffers: Buffers,
+  texture: WebGLTexture,
+  deltaTime: number
 ) => {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
-  gl.clearDepth(1.0); // Clear everything
-  gl.enable(gl.DEPTH_TEST); // Enable depth testing
-  gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+  const { shaderProgram, attributeLocations, uniformLocations } = programInfo;
 
-  // Clear the canvas before we start drawing on it.
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
+  setBackground(gl);
 
   const fieldOfView = (45 * Math.PI) / 180; // in radians
   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
   const zNear = 0.1;
   const zFar = 100.0;
   const projectionMatrix = mat4.create();
+  const modelViewMatrix = mat4.create();
+  const normalMatrix = mat4.create();
 
   // note: glmatrix.js always has the first argument
   // as the destination to receive the result.
   mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-  // Set the drawing position to the "identity" point, which is
-  // the center of the scene.
-  const modelViewMatrix = mat4.create();
-
   // Now move the drawing position a bit to where we want to
   // start drawing the square.
-
   mat4.translate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to translate
-    [-0.0, 0.0, -6.0]
-  ); // amount to translate
+    [-0.0, 0.0, -6.0] // amount to translate
+  );
 
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
     cubeRotation, // amount to rotate in radians
-    [0, 0, 1]
-  ); // axis to rotate around (Z)
+    [0, 0, 1] // axis to rotate around (Z)
+  );
 
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
     cubeRotation * 0.7, // amount to rotate in radians
-    [0, 1, 0]
-  ); // axis to rotate around (X)
+    [0, 1, 0] // axis to rotate around (X)
+  );
+
+  // calculate lighting this is for lighting
+  mat4.invert(normalMatrix, modelViewMatrix);
+  mat4.transpose(normalMatrix, normalMatrix);
 
   // POSITION
   // Tell WebGL how to pull out the positions from the position
   // buffer into the vertexPosition attribute
   {
-    const numComponents = 3; // pull out 2 values per iteration
+    const numComponents = 3; // pull out 3 values per iteration
     const type = gl.FLOAT; // the data in the buffer is 32bit floats
     const normalize = false; // don't normalize
     const stride = 0; // how many bytes to get from one set of values to the next
     const offset = 0; // how many bytes inside the buffer to start from
     const positionVertexArray = new VertexArray(
       buffers.position,
-      programInfo.attribLocations.vertexPosition,
+      attributeLocations.vertexPosition,
       numComponents,
       type,
       normalize,
@@ -84,15 +76,17 @@ const drawScene = (
   }
 
   // COLOR
+  // Tell WebGL how to pull out the color from the color
+  // buffer into the vertexPosition attribute
   {
-    const numComponents = 4; // pull out 2 values per iteration
-    const type = gl.FLOAT; // the data in the buffer is 32bit floats
-    const normalize = false; // don't normalize
-    const stride = 0; // how many bytes to get from one set of values to the next
-    const offset = 0; // how many bytes inside the buffer to start from
+    const numComponents = 4;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
     const colorVertexArray = new VertexArray(
       buffers.color,
-      programInfo.attribLocations.vertexColor,
+      attributeLocations.vertexColor,
       numComponents,
       type,
       normalize,
@@ -113,7 +107,7 @@ const drawScene = (
     const offset = 0;
     const textureVertexArray = new VertexArray(
       buffers.textureCoord,
-      programInfo.attribLocations.textureCoord,
+      attributeLocations.textureCoord,
       numComponents,
       type,
       normalize,
@@ -134,7 +128,7 @@ const drawScene = (
     const offset = 0;
     const normalVertexArray = new VertexArray(
       buffers.normal,
-      programInfo.attribLocations.vertexNormal,
+      attributeLocations.vertexNormal,
       numComponents,
       type,
       normalize,
@@ -144,48 +138,23 @@ const drawScene = (
     normalVertexArray.enable(gl);
   }
 
-  // Tell WebGL which indices to use to index the vertices
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-
   // Tell WebGL to use our program when drawing
-  gl.useProgram(programInfo.program);
+  shaderProgram.bind();
 
   // SET UNIFORMS
+  shaderProgram.setUniform4f(uniformLocations.projectionMatrix, projectionMatrix);
+  shaderProgram.setUniform4f(uniformLocations.modelViewMatrix, modelViewMatrix);
+  shaderProgram.setUniform4f(uniformLocations.normalMatrix, normalMatrix);
 
-  // this sets uProjectionMatrix in the vertex shader
-  // to be equal to the projection matrix. Don't worry
-  // about the "false", that is required to be false, not sure
-  // why that needs to be passed (because it's bad design)
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.projectionMatrix,
-    false,
-    projectionMatrix
-  );
-
-  // uModelViewMatrix
-  gl.uniformMatrix4fv(
-    programInfo.uniformLocations.modelViewMatrix,
-    false,
-    modelViewMatrix
-  );
-
-  // uNormalMatrix, this is for lighting
-  const normalMatrix = mat4.create();
-  mat4.invert(normalMatrix, modelViewMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
-  gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
+  shaderProgram.setUniform1f(uniformLocations.uTime, deltaTime);
 
   // Specify the texture to map onto the faces.
-
   // Tell WebGL we want to affect texture unit 0
   gl.activeTexture(gl.TEXTURE0);
   // Bind the texture to texture unit 0
   gl.bindTexture(gl.TEXTURE_2D, texture);
   // Tell the shader we bound the texture to texture unit 0
-  gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
-
-  // pass deltaTime as uniform to GLSL
-  gl.uniform1f(programInfo.uniformLocations.uTime, deltaTime);
+  gl.uniform1i(uniformLocations.uSampler, 0);
 
   {
     const vertexCount = 36;
@@ -196,6 +165,16 @@ const drawScene = (
 
   // Update the rotation for the next draw
   cubeRotation += deltaTime;
+};
+
+const setBackground = (gl: WebGLRenderingContext) => {
+  gl.clearColor(0.0, 0.0, 0.0, 1.0); // Clear to black, fully opaque
+  gl.clearDepth(1.0); // Clear everything
+  gl.enable(gl.DEPTH_TEST); // Enable depth testing
+  gl.depthFunc(gl.LEQUAL); // Near things obscure far things
+
+  // Clear the canvas before we start drawing on it.
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };
 
 export { drawScene };

@@ -16,7 +16,7 @@ const cubeShaders = {
 
   void main(void) {
     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-    vColor =aVertexColor * aVertexPosition / 10.0;
+    vColor =  aVertexPosition;
 
     // Apply lighting effect
     highp vec3 ambientLight = vec3(0.5, 0.5, 0.5);
@@ -27,6 +27,10 @@ const cubeShaders = {
 
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
+
+    // use unused attributes here so errors arent thrown (temporary)
+    highp vec4 colorWaste = vec4(aVertexColor);
+    highp vec2 textureWaste = vec2(aTextureCoord);
   }
 `,
 
@@ -42,9 +46,9 @@ const cubeShaders = {
     highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
 
     gl_FragColor = vec4(
-      cos(vColor.r * uTime/0.1),
-      cos(vColor.g * uTime/0.1),
-      cos(vColor.b * uTime/0.1),
+      sin(vColor.r * uTime/1.5),
+      sin(vColor.g * uTime/1.5),
+      sin(vColor.b * uTime/1.5),
       texelColor.a
       );
   }

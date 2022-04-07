@@ -25,8 +25,7 @@ class VertexArray {
     this.offset = offset;
   }
 
-  enable(gl: WebGL2RenderingContext) {
-    console.log();
+  enable(gl: WebGLRenderingContext) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.vertexAttribPointer(
       this.attribute,

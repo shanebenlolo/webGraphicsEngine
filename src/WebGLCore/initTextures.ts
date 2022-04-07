@@ -2,7 +2,7 @@
 // Initialize a texture and load an image.
 // When the image finished loading copy it into the texture.
 //
-const initTextures = (gl: WebGL2RenderingContext, url: string) => {
+const initTextures = (gl: WebGLRenderingContext, url: string) => {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
