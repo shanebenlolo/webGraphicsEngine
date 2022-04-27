@@ -5,7 +5,7 @@ interface GLProps {
   gl: WebGLRenderingContext;
   programInfo: ProgramInfo;
   buffers: Buffers;
-  texture: WebGLTexture;
+  // texture: WebGLTexture;
 }
 
 export { GLProps };

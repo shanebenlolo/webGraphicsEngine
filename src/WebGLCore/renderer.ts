@@ -8,9 +8,9 @@ const render = (renderProps: GLProps, timestamp: number, spinRate: number) => {
   const deltaTime = timestamp - then;
   then = timestamp;
 
-  const { gl, programInfo, buffers, texture } = renderProps;
+  const { gl, programInfo, buffers } = renderProps;
 
-  drawScene(gl, programInfo, buffers, texture, deltaTime);
+  drawScene(gl, programInfo, buffers, deltaTime, timestamp);
 
   const animationId = requestAnimationFrame((timestamp) => {
     render(renderProps, timestamp, spinRate);

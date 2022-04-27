@@ -2,13 +2,8 @@ import { cube } from "../apis/shapes/cube/cubeBuffers";
 import { IndexBuffer } from "./classes/IndexBuffer";
 import { VertexBuffer } from "./classes/VertexBuffer";
 
-function initBuffers(gl: WebGLRenderingContext) {
-  var colors: Array<number> = [];
-  for (var j = 0; j < cube.colorBuffer.length; j++) {
-    const c = cube.colorBuffer[j];
-    // assign rgba value at every corner (vertex) of each cube face
-    colors = colors.concat(c, c, c, c);
-  }
+function initBuffers(gl: WebGLRenderingContext, shape: string) {
+  const colors: Array<number> = generateColors(shape);
 
   const colorBuffer = new VertexBuffer(gl, new Float32Array(colors));
   const positionBuffer = new VertexBuffer(gl, new Float32Array(cube.positionBuffer));
@@ -25,5 +20,20 @@ function initBuffers(gl: WebGLRenderingContext) {
     indices: indexBuffer.buffer,
   };
 }
+
+const generateColors = (shape: string): Array<number> => {
+  let colors: Array<number> = [];
+  if (shape === "cube") {
+    for (var j = 0; j < cube.colorBuffer.length; j++) {
+      const c = cube.colorBuffer[j];
+      // assign rgba value at every corner (vertex) of each cube face
+      colors = colors.concat(c, c, c, c);
+    }
+  }
+  if (shape === "sphere") {
+    // TO DO
+  }
+  return colors;
+};
 
 export { initBuffers };

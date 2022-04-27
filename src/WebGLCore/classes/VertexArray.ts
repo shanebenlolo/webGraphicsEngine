@@ -1,13 +1,15 @@
 class VertexArray {
+  gl: WebGLRenderingContext;
   buffer: WebGLBuffer;
-  attribute: number;
-  numComponents: number;
-  type: number;
-  normalize: boolean;
-  stride: number;
-  offset: number;
+  attribute: number; // memory location of attribute to be assigned to
+  numComponents: number; // how values to pull out per iteration
+  type: number; // the type of data in the buffer (32bit floats, 16bit ints, etc.)
+  normalize: boolean; // do/don't normalize
+  stride: number; // how many bytes to get from one set of values to the next
+  offset: number; // how many bytes inside the buffer to start from
 
   constructor(
+    gl: WebGLRenderingContext,
     buffer: WebGLBuffer,
     attribute: number,
     numComponents: number,
@@ -16,6 +18,7 @@ class VertexArray {
     stride: number,
     offset: number
   ) {
+    this.gl = gl;
     this.buffer = buffer;
     this.attribute = attribute;
     this.numComponents = numComponents;
@@ -25,9 +28,9 @@ class VertexArray {
     this.offset = offset;
   }
 
-  enable(gl: WebGLRenderingContext) {
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-    gl.vertexAttribPointer(
+  enable() {
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer);
+    this.gl.vertexAttribPointer(
       this.attribute,
       this.numComponents,
       this.type,
@@ -35,7 +38,7 @@ class VertexArray {
       this.stride,
       this.offset
     );
-    gl.enableVertexAttribArray(this.attribute);
+    this.gl.enableVertexAttribArray(this.attribute);
   }
 }
 
