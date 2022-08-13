@@ -34,6 +34,10 @@ class ShaderProgram {
     this.gl.uniform1f(uniformLocation, value);
   }
 
+  setUniform3f(uniformLocation: WebGLUniformLocation, xyz: number[]) {
+    this.gl.uniform3f(uniformLocation, xyz[0], xyz[1], xyz[2]);
+  }
+
   setUniform4f(uniformLocation: WebGLUniformLocation, matrix: mat4) {
     this.gl.uniformMatrix4fv(uniformLocation, false, matrix);
   }

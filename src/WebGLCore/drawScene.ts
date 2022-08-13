@@ -3,60 +3,98 @@ import { VertexArray } from "./classes/VertexArray";
 import { Buffers } from "./interfaces/Buffers";
 import { ProgramInfo, AttributeLocations } from "./interfaces/ProgramInfo";
 
-let cubeRotation: number = 0.0;
-
 const drawScene = (
   gl: WebGLRenderingContext,
-  programInfo: ProgramInfo,
-  buffers: Buffers,
-  deltaTime: number,
-  timestamp: number
+  programInfoA: ProgramInfo,
+  programInfoB: ProgramInfo,
+  buffersA: Buffers,
+  buffersB: Buffers,
+  ambientLightValues: number[],
+  rotation: { x: number; y: number; z: number },
+  translation: { x: number; y: number; z: number }
 ) => {
-  const { shaderProgram, attributeLocations, uniformLocations } = programInfo;
-
-  const projectionMatrix: mat4 = createProjectionMatrix(gl);
-  const modelViewMatrix: mat4 = mat4.create();
-  const normalMatrix: mat4 = mat4.create();
-
   setBackground(gl);
+
+  const shaderProgramA = programInfoA.shaderProgram;
+  const attributeLocationsA = programInfoA.attributeLocations;
+  const uniformLocationsA = programInfoA.uniformLocations;
+
+  const shaderProgramB = programInfoB.shaderProgram;
+  const attributeLocationsB = programInfoB.attributeLocations;
+  const uniformLocationsB = programInfoB.uniformLocations;
+
+  const projectionMatrixA: mat4 = createProjectionMatrix(gl);
+  const modelViewMatrixA: mat4 = mat4.create();
+  const normalMatrixA: mat4 = mat4.create();
+
+  const projectionMatrixB: mat4 = createProjectionMatrix(gl);
+  const modelViewMatrixB: mat4 = mat4.create();
+  const normalMatrixB: mat4 = mat4.create();
 
   // push the cube away from the center a bit so we are not
   // viewing the center of the cube
   mat4.translate(
-    modelViewMatrix, // destination matrix
-    modelViewMatrix, // matrix to translate
-    [-0.0, 0.0, -6.0] // amount to translate
+    modelViewMatrixA, // destination matrix
+    modelViewMatrixA, // matrix to translate
+    [translation.x, translation.y, translation.z] // amount to translate
   );
 
-  rotateCube(modelViewMatrix, cubeRotation);
+  // push the cube away from the center a bit so we are not
+  // viewing the center of the cube
+  mat4.translate(
+    modelViewMatrixB, // destination matrix
+    modelViewMatrixB, // matrix to translate
+    [translation.x + 3.0, translation.y, translation.z] // amount to translate
+  );
 
-  // calculate the lighting
-  mat4.invert(normalMatrix, modelViewMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
-
-  // create and enable all vertex arrays
-  createVertexArrays(gl, buffers, attributeLocations).forEach((vertexArray) => {
-    vertexArray.enable();
+  // we will only rotate cube a to test...
+  rotateCube(modelViewMatrixA, rotation);
+  rotateCube(modelViewMatrixB, {
+    x: -rotation.x,
+    y: -rotation.y,
+    z: -rotation.z,
   });
 
-  // Tell WebGL to use our program when drawing
-  shaderProgram.bind();
+  // calculate the lighting
+  mat4.invert(normalMatrixA, modelViewMatrixA);
+  mat4.transpose(normalMatrixA, normalMatrixA);
+  // calculate the lighting
+  mat4.invert(normalMatrixB, modelViewMatrixB);
+  mat4.transpose(normalMatrixB, normalMatrixB);
 
-  // SET UNIFORMS
-  shaderProgram.setUniform4f(uniformLocations.projectionMatrix, projectionMatrix);
-  shaderProgram.setUniform4f(uniformLocations.modelViewMatrix, modelViewMatrix);
-  shaderProgram.setUniform4f(uniformLocations.normalMatrix, normalMatrix);
-
-  shaderProgram.setUniform1f(uniformLocations.uTime, timestamp);
+  // create and enable all vertex arrays
+  createVertexArrays(gl, buffersA, attributeLocationsA).forEach((vertexArray) => {
+    vertexArray.enable();
+  });
+  // create and enable all vertex arrays
+  createVertexArrays(gl, buffersB, attributeLocationsB).forEach((vertexArray) => {
+    vertexArray.enable();
+  });
 
   // I'm honestly confused why this is 36, need to ask someone
   const vertexCount = 36;
   const type = gl.UNSIGNED_SHORT;
   const offset = 0;
+
+  // Tell WebGL to use our program when drawing
+  // set the uniforms for the shader
+  // draw
+  shaderProgramA.bind();
+  shaderProgramA.setUniform4f(uniformLocationsA.projectionMatrix, projectionMatrixA);
+  shaderProgramA.setUniform4f(uniformLocationsA.modelViewMatrix, modelViewMatrixA);
+  shaderProgramA.setUniform4f(uniformLocationsA.normalMatrix, normalMatrixA);
+  shaderProgramA.setUniform3f(uniformLocationsA.uAmbientLight, ambientLightValues);
   gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
 
-  // Update the rotation for the next draw
-  cubeRotation += deltaTime;
+  // Tell WebGL to use our program when drawing
+  // set the uniforms for the shader
+  // draw
+  shaderProgramB.bind();
+  shaderProgramB.setUniform4f(uniformLocationsB.projectionMatrix, projectionMatrixB);
+  shaderProgramB.setUniform4f(uniformLocationsB.modelViewMatrix, modelViewMatrixB);
+  shaderProgramB.setUniform4f(uniformLocationsB.normalMatrix, normalMatrixB);
+  shaderProgramB.setUniform3f(uniformLocationsB.uAmbientLight, ambientLightValues);
+  gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
 };
 
 const setBackground = (gl: WebGLRenderingContext) => {
@@ -120,19 +158,29 @@ const createProjectionMatrix = (gl: WebGLRenderingContext): mat4 => {
   return mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 };
 
-const rotateCube = (modelViewMatrix: mat4, cubeRotation: number) => {
+const rotateCube = (
+  modelViewMatrix: mat4,
+  rotation: { x: number; y: number; z: number }
+) => {
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
-    cubeRotation, // amount to rotate in radians
+    rotation.z, // amount to rotate in radians
     [0, 0, 1] // axis to rotate around (Z)
   );
 
   mat4.rotate(
     modelViewMatrix, // destination matrix
     modelViewMatrix, // matrix to rotate
-    cubeRotation * 0.7, // amount to rotate in radians
+    rotation.x, // amount to rotate in radians
     [0, 1, 0] // axis to rotate around (X)
+  );
+
+  mat4.rotate(
+    modelViewMatrix, // destination matrix
+    modelViewMatrix, // matrix to rotate
+    rotation.y, // amount to rotate in radians
+    [1, 0, 0] // axis to rotate around (Y)
   );
 };
 

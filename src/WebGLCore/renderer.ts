@@ -3,17 +3,28 @@ import { GLProps } from "./interfaces/GLProps";
 
 let then = 0;
 
-const render = (renderProps: GLProps, timestamp: number, spinRate: number) => {
-  timestamp *= spinRate;
-  const deltaTime = timestamp - then;
-  then = timestamp;
+const render = (
+  renderProps: GLProps,
+  ambientLight: number,
+  rotation: { x: number; y: number; z: number },
+  translation: { x: number; y: number; z: number }
+) => {
+  const ambientLightValues = [ambientLight, ambientLight, ambientLight];
+  const { gl, programInfoA, programInfoB, buffersA, buffersB } = renderProps;
 
-  const { gl, programInfo, buffers } = renderProps;
-
-  drawScene(gl, programInfo, buffers, deltaTime, timestamp);
+  drawScene(
+    gl,
+    programInfoA,
+    programInfoB,
+    buffersA,
+    buffersB,
+    ambientLightValues,
+    rotation,
+    translation
+  );
 
   const animationId = requestAnimationFrame((timestamp) => {
-    render(renderProps, timestamp, spinRate);
+    render(renderProps, ambientLight, rotation, translation);
   });
 
   return animationId;

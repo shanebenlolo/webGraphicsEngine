@@ -10,21 +10,6 @@ export function Navbar() {
           Home
         </Link>
       </nav>
-      <nav className="nav">
-        <Link className="link" to="/sign-up">
-          Sign Up
-        </Link>
-      </nav>
-      <nav className="nav">
-        <Link className="link" to="/login">
-          Login
-        </Link>
-      </nav>
-      <nav className="nav">
-        <Link className="link" to="/userlist">
-          User List
-        </Link>
-      </nav>
     </div>
   );
 }

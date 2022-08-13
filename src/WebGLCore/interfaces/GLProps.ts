@@ -3,8 +3,10 @@ import { ProgramInfo } from "./ProgramInfo";
 
 interface GLProps {
   gl: WebGLRenderingContext;
-  programInfo: ProgramInfo;
-  buffers: Buffers;
+  programInfoA: ProgramInfo;
+  programInfoB: ProgramInfo;
+  buffersA: Buffers;
+  buffersB: Buffers;
   // texture: WebGLTexture;
 }
 

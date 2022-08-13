@@ -11,30 +11,49 @@ const initWebGL = (
 ) => {
   const canvas = canvasRef.current;
   const gl: WebGLRenderingContext = canvas.getContext("webgl");
-  const shaderProgram = initShaders(gl);
-  const { program } = shaderProgram;
+  const shaderProgramA = initShaders(gl);
+  const shaderProgramB = initShaders(gl);
+  const programA = shaderProgramA.program;
+  const programB = shaderProgramB.program;
 
-  const programInfo: ProgramInfo = {
-    shaderProgram: shaderProgram,
+  const programInfoA: ProgramInfo = {
+    shaderProgram: shaderProgramA,
     attributeLocations: {
-      vertexPosition: gl.getAttribLocation(program, "aVertexPosition"),
-      vertexColor: gl.getAttribLocation(program, "aVertexColor"),
-      vertexNormal: gl.getAttribLocation(program, "aVertexNormal"),
+      vertexPosition: gl.getAttribLocation(programA, "aVertexPosition"),
+      vertexColor: gl.getAttribLocation(programA, "aVertexColor"),
+      vertexNormal: gl.getAttribLocation(programA, "aVertexNormal"),
     },
     uniformLocations: {
-      normalMatrix: gl.getUniformLocation(program, "uNormalMatrix"),
-      modelViewMatrix: gl.getUniformLocation(program, "uModelViewMatrix"),
-      projectionMatrix: gl.getUniformLocation(program, "uProjectionMatrix"),
-      uTime: gl.getUniformLocation(program, "uTime"),
+      normalMatrix: gl.getUniformLocation(programA, "uNormalMatrix"),
+      modelViewMatrix: gl.getUniformLocation(programA, "uModelViewMatrix"),
+      projectionMatrix: gl.getUniformLocation(programA, "uProjectionMatrix"),
+      uAmbientLight: gl.getUniformLocation(programA, "uAmbientLight"),
+    },
+  };
+  const programInfoB: ProgramInfo = {
+    shaderProgram: shaderProgramB,
+    attributeLocations: {
+      vertexPosition: gl.getAttribLocation(programB, "aVertexPosition"),
+      vertexColor: gl.getAttribLocation(programB, "aVertexColor"),
+      vertexNormal: gl.getAttribLocation(programB, "aVertexNormal"),
+    },
+    uniformLocations: {
+      normalMatrix: gl.getUniformLocation(programB, "uNormalMatrix"),
+      modelViewMatrix: gl.getUniformLocation(programB, "uModelViewMatrix"),
+      projectionMatrix: gl.getUniformLocation(programB, "uProjectionMatrix"),
+      uAmbientLight: gl.getUniformLocation(programB, "uAmbientLight"),
     },
   };
 
-  const buffers: Buffers = initBuffers(gl, shape);
+  const buffersA: Buffers = initBuffers(gl, shape);
+  const buffersB: Buffers = initBuffers(gl, shape);
 
   const renderProps: GLProps = {
     gl,
-    programInfo,
-    buffers,
+    programInfoA,
+    programInfoB,
+    buffersA,
+    buffersB,
   };
 
   return renderProps;

@@ -7,7 +7,7 @@ const cubeShaders = {
   uniform mat4 uNormalMatrix;
   uniform mat4 uModelViewMatrix;
   uniform mat4 uProjectionMatrix;
-  uniform float uTime;
+  uniform vec3 uAmbientLight;
 
   varying highp vec4 vColor;
   varying highp vec3 vLighting;
@@ -17,7 +17,7 @@ const cubeShaders = {
     vColor =  aVertexColor;
 
     // Apply lighting effect
-    highp vec3 ambientLight = vec3(0.5, 0.5, 0.5);
+    highp vec3 ambientLight = vec3(uAmbientLight);
     highp vec3 directionalLightColor = vec3(1, 1, 1);
     highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
 
@@ -31,8 +31,6 @@ const cubeShaders = {
   fragmentShader: /*glsl*/ `
   varying highp vec4 vColor;
   varying highp vec3 vLighting;
-
-  uniform highp float uTime;
 
   void main(void) {
     gl_FragColor = vec4(sin(vColor.rgb * vLighting), vColor.a);

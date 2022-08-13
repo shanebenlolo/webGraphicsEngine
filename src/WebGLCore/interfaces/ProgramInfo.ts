@@ -17,7 +17,7 @@ interface UniformLocations {
   projectionMatrix: WebGLUniformLocation | null;
   modelViewMatrix: WebGLUniformLocation | null;
   normalMatrix: WebGLUniformLocation | null;
-  uTime: WebGLUniformLocation | null;
+  uAmbientLight: WebGLUniformLocation | null;
   // uSampler: WebGLUniformLocation | null;
 }
 
