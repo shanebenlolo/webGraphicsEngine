@@ -1,33 +1,44 @@
 import { drawScene } from "./drawScene";
-import { GLProps } from "./interfaces/GLProps";
+import { initBuffers } from "./initBuffers";
+import { initShaders } from "./initShaders";
+import { SceneState } from "./interfaces/SceneState";
 
-let then = 0;
+const state: SceneState = {
+  intialized: false,
+  objectCount: -1,
+  buffers: new Map(),
+  programs: new Map(),
+};
 
 const render = (
-  renderProps: GLProps,
+  gl: WebGLRenderingContext,
+  objectCount: number,
   ambientLight: number,
   rotation: { x: number; y: number; z: number },
   translation: { x: number; y: number; z: number }
 ) => {
-  const ambientLightValues = [ambientLight, ambientLight, ambientLight];
-  const { gl, programInfoA, programInfoB, buffersA, buffersB } = renderProps;
+  // if objCount doesn't match or buffers havent' been established, recreate buffers
+  if (objectCount !== state.objectCount || state.intialized === false) {
+    const numObjsToCreate: number = objectCount - state.objectCount;
+
+    for (let i = 0; i < numObjsToCreate; i++) {
+      state.buffers.set(state.objectCount + 1, initBuffers(gl));
+      state.programs.set(state.objectCount + 1, initShaders(gl));
+      state.objectCount++;
+    }
+
+    state.intialized = true;
+  }
 
   drawScene(
     gl,
-    programInfoA,
-    programInfoB,
-    buffersA,
-    buffersB,
-    ambientLightValues,
+    objectCount,
+    state.buffers,
+    state.programs,
+    [ambientLight, ambientLight, ambientLight],
     rotation,
     translation
   );
-
-  const animationId = requestAnimationFrame((timestamp) => {
-    render(renderProps, ambientLight, rotation, translation);
-  });
-
-  return animationId;
 };
 
 export { render };

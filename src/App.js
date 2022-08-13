@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Navbar } from "./components/navbar/Navbar";
 import { Routes, Route } from "react-router-dom";
 
-import { WebglCanvas } from "./components/webglCanvas/WebglCanvas";
+import { WebglCanvas } from "./components/WebglCanvas";
 
 import "./App.css";
 
