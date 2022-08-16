@@ -1,9 +1,9 @@
 class IndexBuffer {
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
   data: Uint16Array;
   buffer: WebGLBuffer | null;
 
-  constructor(gl: WebGLRenderingContext, data: Uint16Array) {
+  constructor(gl: WebGL2RenderingContext, data: Uint16Array) {
     this.gl = gl;
     this.buffer = this.gl.createBuffer();
     this.data = data;

@@ -1,10 +1,10 @@
 class Shader {
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
   type: number;
   source: string;
   glShader: WebGLShader | null;
 
-  constructor(gl: WebGLRenderingContext, type: number, source: string) {
+  constructor(gl: WebGL2RenderingContext, type: number, source: string) {
     this.gl = gl;
     this.type = type;
     this.source = source;

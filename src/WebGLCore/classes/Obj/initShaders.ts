@@ -1,9 +1,9 @@
-import { cubeShaders } from "../apis/shapes/cube/cubeShaders";
-import { Shader } from "./classes/Shader";
-import { ShaderProgram } from "./classes/ShaderProgram";
-import { ProgramInfo } from "./interfaces/ProgramInfo";
+import { cubeShaders } from "../../../apis/shapes/cube/cubeShaders";
+import { Shader } from "../../classes/Shader";
+import { ShaderProgram } from "../../classes/ShaderProgram";
+import { ProgramInfo } from "../../interfaces/ProgramInfo";
 
-const initShaders = (gl: WebGLRenderingContext) => {
+const initShaders = (gl: WebGL2RenderingContext) => {
   const vertexShader = new Shader(gl, gl.VERTEX_SHADER, cubeShaders.vertexShader);
   const fragmentShader = new Shader(gl, gl.FRAGMENT_SHADER, cubeShaders.fragmentShader);
 

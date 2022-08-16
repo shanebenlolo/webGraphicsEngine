@@ -1,32 +1,66 @@
+import Checkbox from "@mui/material/Checkbox";
 import React, { useState } from "react";
+
+interface Layer {
+  selected: boolean;
+  name: string;
+  // index where the corresponding 3D Object is stored
+  objectId: number;
+}
 
 export function Layers(props: {
   objectCount: number;
-  updateCount: (value: number) => void;
+  addObject: (id: number) => void;
+  deleteObject: (id: number) => void;
+  selectObject: (id: number) => void;
 }) {
-  const [layers, setLayers] = useState([{ name: "layer 0" }]);
+  const [layers, setLayers] = useState([] as Layer[]);
+  const [layerCount, setLayerCount] = useState(0);
 
-  const { objectCount, updateCount } = props;
+  const { objectCount, addObject, deleteObject, selectObject } = props;
 
-  const addLayer = (newCount: number, layer: { name: string }) => {
+  const addLayer = (layer: Layer) => {
     layers.push(layer);
-    updateCount(newCount);
+    addObject(layer.objectId);
   };
 
-  const removeLayer = (newCount: number) => {
-    layers.pop();
-    updateCount(newCount);
+  const removeLayer = (objectId: number) => {
+    const index = layers.findIndex((layer) => layer.objectId === objectId);
+    layers.splice(index, 1);
+    setLayerCount(layerCount + 1);
+    deleteObject(objectId);
+  };
+
+  const selectLayer = (objectId: number) => {
+    const index = layers.findIndex((layer) => layer.objectId === objectId);
+    layers[index].selected = !layers[index].selected;
+    setLayers([...layers]);
+    selectObject(objectId);
   };
 
   return (
     <div className="layers">
-      <button onClick={() => removeLayer(objectCount - 1)}>-</button>
-      <button onClick={() => addLayer(objectCount + 1, { name: `layer ${objectCount}` })}>
-        +
+      <button
+        onClick={() =>
+          addLayer({
+            name: `layer ${layerCount}`,
+            objectId: objectCount,
+            selected: false,
+          })
+        }
+      >
+        Add Object
       </button>
       {objectCount}
-      {layers.map((layer) => (
-        <div className="layer">{layer.name}</div>
+      {layers.map((layer, key) => (
+        <div key={key} className="layer">
+          {layer.name}
+          <button onClick={() => removeLayer(layer.objectId)}>Delete</button>
+          <Checkbox
+            checked={layer.selected}
+            onChange={() => selectLayer(layer.objectId)}
+          />
+        </div>
       ))}
     </div>
   );

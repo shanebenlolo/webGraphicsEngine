@@ -1,9 +1,7 @@
-import { Buffers } from "./Buffers";
-import { ProgramInfo } from "./ProgramInfo";
+import { Obj } from "../classes/Obj/Obj";
 
+// currently unused
 export interface SceneState {
-  intialized: boolean;
-  objectCount: number;
-  buffers: Map<number, Buffers>;
-  programs: Map<number, ProgramInfo>;
+  objMap: Map<number, Obj>;
+  lighting: number[];
 }

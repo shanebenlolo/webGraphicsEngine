@@ -1,5 +1,5 @@
 class VertexArray {
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
   buffer: WebGLBuffer;
   attribute: number; // memory location of attribute to be assigned to
   numComponents: number; // how values to pull out per iteration
@@ -9,7 +9,7 @@ class VertexArray {
   offset: number; // how many bytes inside the buffer to start from
 
   constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     buffer: WebGLBuffer,
     attribute: number,
     numComponents: number,

@@ -1,0 +1,39 @@
+.graphicsEngine {
+  display: flex;
+  /* justify-content: center;
+  align-items: center; */
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+}
+
+.controls {
+  width: 100%;
+  margin: 5%
+}
+
+.layers {
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.layer {
+
+}
+
+.canvasContainer {
+  width: 80%;
+  margin: 5%;
+}
+
+.shapes {
+  border: 0.2em solid white;
+  border-radius: 0.2em;
+  margin: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

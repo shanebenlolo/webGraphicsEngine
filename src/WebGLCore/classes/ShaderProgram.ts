@@ -1,13 +1,13 @@
 import { mat4 } from "gl-matrix";
 
 class ShaderProgram {
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
   program: WebGLProgram | null;
   vertexShader: WebGLShader;
   fragmentShader: WebGLShader;
 
   constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     vertexShader: WebGLShader,
     fragmentShader: WebGLShader
   ) {

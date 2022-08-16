@@ -1,6 +1,6 @@
 import React from "react";
 import Slider from "@mui/material/Slider";
-import "./webgl.css";
+import "./ui.css";
 
 export function XyzSliders(props: {
   title: string;

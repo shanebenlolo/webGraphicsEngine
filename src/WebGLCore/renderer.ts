@@ -1,44 +1,29 @@
-import { drawScene } from "./drawScene";
-import { initBuffers } from "./initBuffers";
-import { initShaders } from "./initShaders";
-import { SceneState } from "./interfaces/SceneState";
+import { Obj } from "./classes/Obj/Obj";
+import { Scene } from "./classes/Scene";
 
-const state: SceneState = {
-  intialized: false,
-  objectCount: -1,
-  buffers: new Map(),
-  programs: new Map(),
-};
+let scene: Scene = null;
 
-const render = (
-  gl: WebGLRenderingContext,
-  objectCount: number,
-  ambientLight: number,
-  rotation: { x: number; y: number; z: number },
-  translation: { x: number; y: number; z: number }
+export const objCollection: Map<number, Obj> = new Map();
+
+export const render = (
+  gl: WebGL2RenderingContext,
+  deleteObjId: number,
+  addObjId: number,
+  ambientLight: number
 ) => {
-  // if objCount doesn't match or buffers havent' been established, recreate buffers
-  if (objectCount !== state.objectCount || state.intialized === false) {
-    const numObjsToCreate: number = objectCount - state.objectCount;
+  if (scene === null) {
+    scene = new Scene(gl);
+  }
+  scene.setBackground();
 
-    for (let i = 0; i < numObjsToCreate; i++) {
-      state.buffers.set(state.objectCount + 1, initBuffers(gl));
-      state.programs.set(state.objectCount + 1, initShaders(gl));
-      state.objectCount++;
-    }
-
-    state.intialized = true;
+  // definitely a better way to do this
+  if (deleteObjId !== null) {
+    objCollection.delete(deleteObjId);
+  } else if (addObjId !== null) {
+    objCollection.set(addObjId, new Obj(gl, [ambientLight, ambientLight, ambientLight]));
   }
 
-  drawScene(
-    gl,
-    objectCount,
-    state.buffers,
-    state.programs,
-    [ambientLight, ambientLight, ambientLight],
-    rotation,
-    translation
-  );
+  objCollection.forEach((obj) => {
+    obj.draw();
+  });
 };
-
-export { render };

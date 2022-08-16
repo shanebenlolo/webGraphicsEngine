@@ -1,9 +1,9 @@
-import { cube } from "../apis/shapes/cube/cubeBuffers";
-import { IndexBuffer } from "./classes/IndexBuffer";
-import { VertexBuffer } from "./classes/VertexBuffer";
-import { Buffers } from "./interfaces/Buffers";
+import { cube } from "../../../apis/shapes/cube/cubeBuffers";
+import { IndexBuffer } from "../../classes/IndexBuffer";
+import { VertexBuffer } from "../../classes/VertexBuffer";
+import { Buffers } from "../../interfaces/Buffers";
 
-function initBuffers(gl: WebGLRenderingContext) {
+function initBuffers(gl: WebGL2RenderingContext) {
   const colors: Array<number> = generateColors();
 
   const colorBuffer = new VertexBuffer(gl, new Float32Array(colors));
