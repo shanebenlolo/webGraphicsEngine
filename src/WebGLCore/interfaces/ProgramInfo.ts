@@ -10,7 +10,7 @@ interface AttributeLocations {
   vertexPosition: GLint;
   vertexColor: GLint;
   vertexNormal: GLint;
-  // textureCoord: GLint;
+  textureCoord: GLint;
 }
 
 interface UniformLocations {
@@ -18,7 +18,7 @@ interface UniformLocations {
   modelViewMatrix: WebGLUniformLocation | null;
   normalMatrix: WebGLUniformLocation | null;
   uAmbientLight: WebGLUniformLocation | null;
-  // uSampler: WebGLUniformLocation | null;
+  uSampler: WebGLUniformLocation | null;
 }
 
 export { ProgramInfo, AttributeLocations };

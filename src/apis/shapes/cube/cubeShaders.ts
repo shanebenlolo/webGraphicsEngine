@@ -1,39 +1,33 @@
 const cubeShaders = {
   vertexShader: /*glsl*/ `
   attribute vec4 aVertexPosition;
-  attribute vec4 aVertexColor;
   attribute vec3 aVertexNormal;
-
+  attribute vec2 aTextureCoord;
   uniform mat4 uNormalMatrix;
   uniform mat4 uModelViewMatrix;
   uniform mat4 uProjectionMatrix;
-  uniform vec3 uAmbientLight;
-
-  varying highp vec4 vColor;
+  varying highp vec2 vTextureCoord;
   varying highp vec3 vLighting;
-
   void main(void) {
     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-    vColor =  aVertexColor;
-
+    vTextureCoord = aTextureCoord;
     // Apply lighting effect
-    highp vec3 ambientLight = vec3(uAmbientLight);
+    highp vec3 ambientLight = vec3(0.5, 0.5, 0.5);
     highp vec3 directionalLightColor = vec3(1, 1, 1);
     highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
-
     highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
-
     highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
     vLighting = ambientLight + (directionalLightColor * directional);
   }
 `,
 
   fragmentShader: /*glsl*/ `
-  varying highp vec4 vColor;
+  varying highp vec2 vTextureCoord;
   varying highp vec3 vLighting;
-
+  uniform sampler2D uSampler;
   void main(void) {
-    gl_FragColor = vec4(sin(vColor.rgb * vLighting), vColor.a);
+    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
   }
 `,
 };

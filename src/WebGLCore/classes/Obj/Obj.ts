@@ -4,6 +4,7 @@ import { initShaders } from "./initShaders";
 import { Buffers } from "../../interfaces/Buffers";
 import { AttributeLocations, ProgramInfo } from "../../interfaces/ProgramInfo";
 import { VertexArray } from "../VertexArray";
+import { initTextures } from "./initTextures";
 
 export class Obj {
   gl: WebGL2RenderingContext;
@@ -19,19 +20,25 @@ export class Obj {
   vertexCount: number;
   type: number;
   offset: number;
+  texture: WebGLTexture;
 
   constructor(gl: WebGL2RenderingContext, uAmbientLight: number[]) {
     this.gl = gl;
     this.buffers = initBuffers(gl);
     this.programInfo = initShaders(gl);
 
-    this.uAmbientLight = uAmbientLight;
-    this.rotation = { x: 0, y: 0, z: 0 };
-    this.translation = { x: 0, y: 0, z: -5 };
-
     this.projectionMatrix = this.createProjectionMatrix(gl);
     this.modelViewMatrix = mat4.create();
     this.normalMatrix = mat4.create();
+
+    // load texture, flip pixels into the
+    // bottom-to-top order that WebGL expects.
+    this.texture = initTextures(gl, "/shape-textures/cubetexture1.png");
+    this.gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+    this.uAmbientLight = uAmbientLight;
+    this.rotation = { x: 0, y: 0, z: 0 };
+    this.translation = { x: 0, y: 0, z: -5 };
 
     this.vertexCount = 36;
     this.type = gl.UNSIGNED_SHORT;
@@ -69,6 +76,15 @@ export class Obj {
     shaderProgram.setUniform4f(uniformLocations.modelViewMatrix, this.modelViewMatrix);
     shaderProgram.setUniform4f(uniformLocations.normalMatrix, this.normalMatrix);
     shaderProgram.setUniform3f(uniformLocations.uAmbientLight, this.uAmbientLight);
+
+    // Specify the texture to map onto the faces.
+    // Tell WebGL we want to affect texture unit 0
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    // Bind the texture to texture unit 0
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+    // Tell the shader we bound the texture to texture unit 0
+    this.gl.uniform1i(uniformLocations.uSampler, 0);
+
     this.gl.drawElements(this.gl.TRIANGLES, this.vertexCount, this.type, this.offset);
 
     // reset our matrices for the next draw call
@@ -145,7 +161,23 @@ export class Obj {
       0
     );
 
-    return [positionVertexArray, colorVertexArray, normalVertexArray];
+    const textureVertexArray = new VertexArray(
+      this.gl,
+      this.buffers.textureCoord,
+      attributeLocations.textureCoord,
+      2,
+      this.gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    return [
+      positionVertexArray /*colorVertexArray*/,
+
+      normalVertexArray,
+      textureVertexArray,
+    ];
   };
 
   createProjectionMatrix = (gl: WebGL2RenderingContext): mat4 => {

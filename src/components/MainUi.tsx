@@ -4,16 +4,17 @@ import Slider from "@mui/material/Slider";
 import "./ui.css";
 import { XyzSliders } from "./XyzSliders";
 import { Layers } from "./Layers";
+import { mouseDown } from "../WebGLCore/mouseControls";
 
 let gl: WebGL2RenderingContext;
 
 const vw = Math.max(
-  document.documentElement.clientWidth * 0.8 || 0,
-  window.innerWidth * 0.8 || 0
+  document.documentElement.clientWidth * 0.5 || 0,
+  window.innerWidth * 0.5 || 0
 );
 const vh = Math.max(
-  document.documentElement.clientHeight * 0.8 || 0,
-  window.innerHeight * 0.8 || 0
+  document.documentElement.clientHeight * 0.5 || 0,
+  window.innerHeight * 0.5 || 0
 );
 
 export function MainUi() {
@@ -30,8 +31,9 @@ export function MainUi() {
   const [activeId, setActiveId] = useState(0);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    gl = canvas.getContext("webgl");
+    const canvas: HTMLCanvasElement = canvasRef.current;
+    gl = canvas.getContext("webgl2");
+    canvas.onmousedown = (e) => mouseDown(e, gl);
     // canvasRef.current.addEventListener("click", () => console.log("test"));
     // canvas.onmousedown = mouseDown;
   }, []);
