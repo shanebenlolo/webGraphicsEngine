@@ -2,9 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { objCollection, render } from "../WebGLCore/renderer";
 import Slider from "@mui/material/Slider";
 import "./ui.css";
-import { XyzSliders } from "./XyzSliders";
 import { Layers } from "./Layers";
-import { mouseDown } from "../WebGLCore/mouseControls";
+import {
+  handleMouseControls,
+  mouseDown,
+  mouseMove,
+  mouseOut,
+  mouseUp,
+} from "../WebGLCore/mouseControls";
 
 let gl: WebGL2RenderingContext;
 
@@ -21,7 +26,6 @@ export function MainUi() {
   const canvasRef = useRef(null);
 
   // const [shape, setShape] = useState("cube");
-  const [rerender, setRerender] = useState(false);
   const [objectCount, setObjectCount] = useState(0);
   const [ambientLight, setAmbientLight] = useState(0.5);
   const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
@@ -32,95 +36,44 @@ export function MainUi() {
 
   useEffect(() => {
     const canvas: HTMLCanvasElement = canvasRef.current;
-    gl = canvas.getContext("webgl2");
-    canvas.onmousedown = (e) => mouseDown(e, gl);
-    // canvasRef.current.addEventListener("click", () => console.log("test"));
-    // canvas.onmousedown = mouseDown;
+    // remove preserve arg if you switch to animation loop
+    gl = canvas.getContext("webgl2", { preserveDrawingBuffer: true });
   }, []);
 
   useEffect(() => {
+    handleMouseControls(gl, rotateObject, translateObject, rotation, translation);
     render(gl, objectToDelete, objectToAdd, ambientLight);
     setObjectToDelete(null);
     setObjectToAdd(null);
-  }, [rerender]);
+  });
 
   const updateAmbientLight = (value: number) => {
     setAmbientLight(value);
-    setRerender(!rerender);
   };
 
-  const rotateObject = (payload: { value: number; axis: string }) => {
-    const { value, axis } = payload;
-
-    // update UI
-    switch (axis) {
-      case "x":
-        setRotation(() => ({
-          ...rotation,
-          x: value,
-        }));
-        break;
-      case "y":
-        setRotation(() => ({
-          ...rotation,
-          y: value,
-        }));
-        break;
-      case "z":
-        setRotation(() => ({
-          ...rotation,
-          z: value,
-        }));
-        break;
-    }
-
-    // update Obj
+  const rotateObject = (payload: { x: number; y: number; z: number }) => {
+    setRotation(() => ({
+      ...payload,
+    }));
     objCollection.get(activeId).setRotation(rotation);
-
-    setRerender(!rerender);
   };
 
-  const translateObject = (payload: { value: number; axis: string }) => {
-    //update UI
-    const { value, axis } = payload;
-    switch (axis) {
-      case "x":
-        setTranslation(() => ({
-          ...translation,
-          x: value,
-        }));
-        break;
-      case "y":
-        setTranslation(() => ({
-          ...translation,
-          y: value,
-        }));
-        break;
-      case "z":
-        setTranslation(() => ({
-          ...translation,
-          z: value,
-        }));
-        break;
-    }
-
-    // update Obj
+  const translateObject = (payload: { x: number; y: number; z: number }) => {
+    setTranslation(() => ({
+      ...payload,
+    }));
     objCollection.get(activeId).setTranslation(translation);
-
-    setRerender(!rerender);
   };
 
   const deleteObject = (id: number) => {
     setObjectToDelete(id);
     setObjectCount(objectCount - 1);
-    setRerender(!rerender);
   };
 
   const addObject = (id: number) => {
     setObjectToAdd(id);
     setActiveId(id);
     setObjectCount(objectCount + 1);
-    setRerender(!rerender);
   };
 
   const selectObject = (id: number) => {
@@ -141,26 +94,6 @@ export function MainUi() {
             max={1}
             step={0.01}
           />
-          <XyzSliders
-            title="Rotate"
-            x={rotation.x}
-            y={rotation.y}
-            z={rotation.z}
-            min={-2}
-            max={2}
-            step={0.01}
-            callback={rotateObject}
-          />
-          <XyzSliders
-            title="Translate"
-            x={translation.x}
-            y={translation.y}
-            z={translation.z}
-            min={-5}
-            max={5}
-            step={0.01}
-            callback={translateObject}
-          />
         </div>
         <Layers
           objectCount={objectCount}
@@ -171,7 +104,13 @@ export function MainUi() {
       </div>
 
       <div className="canvasContainer">
-        <canvas className="canvas" ref={canvasRef} width={vw} height={vh}></canvas>
+        <canvas
+          onContextMenu={(e) => e.preventDefault()}
+          className="canvas"
+          ref={canvasRef}
+          width={vw}
+          height={vh}
+        ></canvas>
       </div>
     </div>
   );
