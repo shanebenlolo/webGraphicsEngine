@@ -1,3 +1,5 @@
+A practice project to learn WebGL using react. Create React App was used, as the focus of this project was educational and not meant to be deployed.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
